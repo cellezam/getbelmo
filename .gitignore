@@ -1,5 +1,7 @@
 node_modules/
 dist/
+main.cjs
+*.tgz
 *.log
 .env
 .env.*

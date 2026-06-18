@@ -1,7 +1,8 @@
 # Publishing @getbelmo/mcp-server
 
 One-time setup and per-release checklist for publishing the MCP server to the
-public npm registry.
+public npm registry. This repo is standalone-buildable: `npm install` then
+`npm run build` produces the publishable `main.cjs` with no monorepo tooling.
 
 ## One-time setup
 
@@ -19,39 +20,35 @@ public npm registry.
 
 ## Per-release checklist
 
-Run from the monorepo root.
+Run from the repo root.
 
 ```bash
 # 1. Verify the working tree is clean and on main
 git status
 git log -1 --oneline
 
-# 2. Build a fresh artifact
-./node_modules/.bin/nx build mcp-server --skip-nx-cache
+# 2. Install deps and build a fresh artifact
+npm install
+npm run typecheck          # tsc --noEmit, catches type errors
+npm run build              # bundles src/main.ts -> ./main.cjs (also runs on prepublishOnly)
 
-# 3. Copy README into the publish directory
-#    (nx esbuild doesn't reliably copy README assets, so we do it here)
-cp apps/mcp-server/README.md dist/apps/mcp-server/README.md
-
-# 4. Sanity-check what will ship
-cd dist/apps/mcp-server
+# 3. Sanity-check what will ship
 cat package.json                  # name, version, bin, license correct?
-node main.cjs --help 2>/dev/null || true   # binary loads
+node main.cjs < /dev/null         # binary loads, exits cleanly on stdin close
 npm pack --dry-run                # list every file that will be published
-#   Expect: main.cjs, package.json, README.md
-#   The pnpm-lock.yaml is not in `files` so it won't ship.
+#   Expect: main.cjs, package.json, README.md, LICENSE
 
-# 5. (Optional) Real tarball preview
+# 4. (Optional) Real tarball preview
 npm pack
 tar -tzf getbelmo-mcp-server-*.tgz
 rm getbelmo-mcp-server-*.tgz
 
-# 6. Publish (will prompt for OTP)
+# 5. Publish (will prompt for OTP; prepublishOnly rebuilds main.cjs)
 npm publish --access public
 
-# 7. Smoke-test the live package
+# 6. Smoke-test the live package
 cd /tmp
-npx -y @getbelmo/mcp-server@1.1.0 < /dev/null
+npx -y @getbelmo/mcp-server@latest < /dev/null
 #   Should print nothing on stdout (stdio MCP server) and exit cleanly when
 #   stdin closes. Any startup crash will show on stderr.
 ```
@@ -60,19 +57,17 @@ npx -y @getbelmo/mcp-server@1.1.0 < /dev/null
 
 1. **Tag the release** in git:
    ```bash
-   git tag mcp-server-v1.0.0
-   git push origin mcp-server-v1.0.0
+   git tag v1.1.1
+   git push origin v1.1.1
    ```
-2. **Announce** in Discord (the help channel) so existing users know to
-   run `auth_login` again — the auth migration means any previously stored
-   Bearer-style token is no longer valid against the cookie-only backend.
+2. **Announce** in Discord (the help channel).
 
 ## Bumping versions
 
-For subsequent releases, edit `apps/mcp-server/package.json` `version` and
-rerun the checklist. Use semver:
+For subsequent releases, edit `package.json` `version` and rerun the
+checklist. npm will not overwrite an already-published version. Use semver:
 
-- Patch (1.0.x): bug fix, no UX change
+- Patch (1.1.x): bug fix, no UX change
 - Minor (1.x.0): new tool, additive change
 - Major (x.0.0): breaking change to tool surface or auth flow
 
@@ -81,8 +76,14 @@ rerun the checklist. Use semver:
 Inspecting `npm pack --dry-run` should show exactly:
 
 - `package.json`
-- `main.cjs` (bundled, single-file Node entry)
+- `main.cjs` (bundled, single-file Node entry — built by `npm run build`)
 - `README.md`
+- `LICENSE`
 
-No source files, no lockfile, no env files. The `files` allowlist isn't set
-because the dist directory already only contains what we want to ship.
+The `files` allowlist in `package.json` keeps `main.cjs` + `README.md`; npm
+always includes `package.json` and `LICENSE`. Source, configs, and
+`node_modules` never ship.
+
+> **Maintainers:** the canonical source lives in the private monorepo under
+> `apps/mcp-server`. This public repo is a mirror of that directory only —
+> never push the monorepo or any `.env*` files here.

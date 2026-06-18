@@ -95,6 +95,21 @@ cookie is invalidated.
 - Credentials at rest are AES-256-GCM encrypted with a key derived from
   hostname + username + homedir.
 
+## Development
+
+This repo is standalone — no monorepo tooling required.
+
+```bash
+npm install      # esbuild + typescript (dev), plus the 3 runtime deps
+npm run typecheck # tsc --noEmit
+npm run build     # bundles src/main.ts -> ./main.cjs (deps stay external)
+node main.cjs     # run the built server over stdio
+```
+
+`npm run build` produces a single-file CJS entry with a node shebang; the
+three runtime dependencies are left external and installed by npm when users
+run the package. Publishing is covered in `PUBLISH.md`.
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

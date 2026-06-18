@@ -1,6 +1,6 @@
 {
   "name": "@getbelmo/mcp-server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Model Context Protocol server for Belmo — sign in, manage workspaces, deploy GitHub repositories, and inspect deployments from your AI coding tool.",
   "keywords": [
     "mcp",
@@ -30,9 +30,19 @@
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "prepublishOnly": "npm run build"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "axios": "^1.6.0",
     "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "esbuild": "^0.19.12",
+    "typescript": "^5.4.0"
   }
 }
