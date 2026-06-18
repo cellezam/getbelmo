@@ -1,0 +1,24 @@
+{
+  "name": "mcp-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mcp-server/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/mcp-server",
+        "main": "apps/mcp-server/src/main.ts",
+        "tsConfig": "apps/mcp-server/tsconfig.app.json",
+        "assets": [],
+        "format": ["cjs"],
+        "bundle": true,
+        "platform": "node",
+        "generatePackageJson": true,
+        "esbuildConfig": "apps/mcp-server/esbuild.config.cjs"
+      }
+    }
+  }
+}

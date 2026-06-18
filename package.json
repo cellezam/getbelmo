@@ -1,0 +1,38 @@
+{
+  "name": "@getbelmo/mcp-server",
+  "version": "1.1.0",
+  "description": "Model Context Protocol server for Belmo — sign in, manage workspaces, deploy GitHub repositories, and inspect deployments from your AI coding tool.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "belmo",
+    "deployment",
+    "claude",
+    "ai-tools"
+  ],
+  "license": "MIT",
+  "author": "Belmo <hello@belmo.io> (https://belmo.io)",
+  "homepage": "https://belmo.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cellezam/getbelmo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cellezam/getbelmo/issues"
+  },
+  "bin": {
+    "belmo-mcp": "./main.cjs"
+  },
+  "files": [
+    "main.cjs",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "axios": "^1.6.0",
+    "zod": "^3.22.0"
+  }
+}
