@@ -25,7 +25,13 @@ export function formatError(error: unknown): string {
         return `Validation failed: ${message}`;
       default:
         if (status && status >= 500) {
-          return 'Server error. Try again in a moment.';
+          // Surface the backend's error detail when it provides one — masking
+          // every 5xx as a generic string makes real bugs undiagnosable. Falls
+          // back to the generic message only when there's no useful detail.
+          const detail = data?.message || data?.error;
+          return typeof detail === 'string' && detail
+            ? `Server error (${status}): ${detail}`
+            : 'Server error. Try again in a moment.';
         }
         if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
           return `Cannot reach the API. Check your connection and API URL.`;
