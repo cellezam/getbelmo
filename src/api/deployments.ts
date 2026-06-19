@@ -20,6 +20,26 @@ export async function createDeployment(params: CreateDeploymentParams) {
   return res.data;
 }
 
+export interface UpdateDeploymentParams {
+  name?: string;
+  branch?: string;
+  framework?: string;
+  buildCommand?: string;
+  startCommand?: string;
+  rootDirectory?: string;
+  publishDirectory?: string;
+  healthCheckPath?: string;
+  autoDeploy?: boolean;
+  includePaths?: string[];
+  ignorePaths?: string[];
+  projectId?: string | null;
+}
+
+export async function updateDeployment(id: string, params: UpdateDeploymentParams) {
+  const res = await getClient().patch(`/deployments/${id}`, params);
+  return res.data;
+}
+
 export async function listDeployments(projectId?: string) {
   const params = projectId ? { projectId } : {};
   const res = await getClient().get('/deployments', { params });

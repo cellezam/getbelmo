@@ -115,6 +115,41 @@ export function registerDeploymentTools(server: McpServer) {
   );
 
   server.tool(
+    'update_deployment',
+    'Update a deployment\'s settings. Only the fields you pass are changed; omit the rest. Note: build-related changes (branch, framework, commands, paths) take effect on the next deploy — trigger a redeploy to apply them.',
+    {
+      deploymentId: z.string(),
+      name: z.string().optional().describe('Display name'),
+      branch: z.string().optional().describe('Git branch to deploy from'),
+      framework: z.enum(VALID_FRAMEWORKS).optional(),
+      buildCommand: z.string().optional(),
+      startCommand: z.string().optional(),
+      rootDirectory: z.string().optional().describe('Monorepo subdirectory to build from'),
+      publishDirectory: z.string().optional().describe('Output dir for static sites'),
+      healthCheckPath: z.string().optional().describe('HTTP path polled for container health'),
+      autoDeploy: z.boolean().optional().describe('Auto-deploy on push'),
+      includePaths: z.array(z.string()).optional().describe('Glob paths that trigger a deploy on push'),
+      ignorePaths: z.array(z.string()).optional().describe('Glob paths ignored for push-triggered deploys'),
+      projectId: z.string().nullable().optional().describe('Move to a project; pass null to unassign'),
+    },
+    async ({ deploymentId, ...fields }) => {
+      try {
+        const params: deploymentsApi.UpdateDeploymentParams = Object.fromEntries(
+          Object.entries(fields).filter(([, v]) => v !== undefined)
+        );
+        if (Object.keys(params).length === 0) {
+          return toolResponse('No fields to update. Pass at least one setting (e.g. name, branch, buildCommand).');
+        }
+        const data = await deploymentsApi.updateDeployment(deploymentId, params);
+        const changed = Object.keys(params).join(', ');
+        return toolJson(data, `Deployment updated (${changed}). Redeploy to apply build-affecting changes.`);
+      } catch (error) {
+        return toolResponse(formatError(error));
+      }
+    }
+  );
+
+  server.tool(
     'get_logs',
     'Get application logs for a deployment.',
     { deploymentId: z.string() },

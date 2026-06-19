@@ -72,7 +72,7 @@ cookie is invalidated.
 | `auth_logout` | Sign out locally and on the backend |
 | `list_workspaces` / `select_workspace` / `create_workspace` | Workspace selection and creation |
 | `list_projects` / `create_project` | Project management |
-| `deploy` / `list_deployments` / `get_deployment` | Create and inspect deployments |
+| `deploy` / `list_deployments` / `get_deployment` / `update_deployment` | Create, inspect, and edit deployments |
 | `redeploy` / `rollback_deployment` / `stop_deployment` / `start_deployment` | Deployment lifecycle |
 | `get_logs` / `list_builds` / `get_build_logs` | Logs and build history |
 | `list_env_vars` / `set_env_vars` / `delete_env_var` | Environment variables |
